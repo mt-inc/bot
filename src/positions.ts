@@ -657,7 +657,7 @@ export class Positions {
     return `${this.name.substr(this.name.indexOf('_'), this.name.length)}-${new Date().getTime()}`.substr(0, 36);
   }
   /** Check position in realtime*/
-  async checkPositionRt(now: number) {
+  async checkPositionRt(now: number, time?: number) {
     this.lastPrice = this.now;
     this.now = now;
     if (this.bestPrice === 0) {
@@ -711,7 +711,7 @@ export class Positions {
           }
         }
         if (this.checkPriceRt(now, true)) {
-          this.closePosition(now);
+          this.closePosition(now, false, undefined, undefined, undefined, time);
         }
       }
     }

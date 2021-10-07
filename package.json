@@ -1,10 +1,10 @@
 {
   "name": "@mt-inc/bot",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Bot for MT Inc. Project",
   "main": "./dist/cjs/index.js",
   "module": "./dist/esm/index.js",
-  "type": "module",
+  "type": "commonjs",
   "files": [
     "dist/"
   ],
@@ -26,7 +26,7 @@
     "typescript": "^4.4.2"
   },
   "dependencies": {
-    "@mt-inc/utils": "^1.0.2",
+    "@mt-inc/utils": "^1.0.3",
     "binance-api-node": "^0.11.21"
   }
 }

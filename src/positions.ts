@@ -313,7 +313,7 @@ export class Positions {
     }
   }
   /** Open position */
-  async openPosition(pr: number, type: typeof SELL | typeof BUY) {
+  async openPosition(pr: number, type: typeof SELL | typeof BUY, time?: number) {
     if (!this.ap) {
       if (this.timer.close) {
         setTimeout(() => this.openPosition(pr, type), 1000);
@@ -336,7 +336,7 @@ export class Positions {
           leverage: this.leverage,
           id,
           sl: this.countSL(type, price, am, (price * am) / this.leverage),
-          time: new Date().getTime(),
+          time: time || new Date().getTime(),
           cost,
           openType: 'LIMIT',
           origQty: am,
@@ -352,6 +352,9 @@ export class Positions {
           await this.binanceOpenPosition();
         } else if (!this.useBinance) {
           this.ap = true;
+          if (time) {
+            this.position.open = true;
+          }
           if (this.cbOpen) {
             this.cbOpen();
           }
@@ -786,7 +789,7 @@ export class Positions {
     return;
   }
   /** Close position */
-  async closePosition(pr: number, reopen = false, market = false, cb?: () => void, i = 0) {
+  async closePosition(pr: number, reopen = false, market = false, cb?: () => void, i = 0, time?: number) {
     const handleError = (e: any) => {
       if (this.timer.close) {
         clearInterval(this.timer.close);
@@ -794,11 +797,11 @@ export class Positions {
       }
       if (e.code === ErrorCodes.INVALID_TIMESTAMP) {
         i++;
-        this.closePosition(pr, reopen, market, cb, i);
+        this.closePosition(pr, reopen, market, cb, i, time);
         return;
       }
       this.handleError(e);
-      this.closePosition(pr, reopen, market, cb, i);
+      this.closePosition(pr, reopen, market, cb, i, time);
     };
     const closePos = (res: QueryFuturesOrderResult, price: number, side: typeof SELL | typeof BUY) => {
       if (this.position) {
@@ -818,7 +821,7 @@ export class Positions {
           price = parseFloat(res.avgPrice);
         }
         if (!this.position.partiallyFilled) {
-          this.makeClose(price, cb);
+          this.makeClose(price, cb, time);
           if (reopen) {
             this.openPosition(price, side);
           }
@@ -826,7 +829,7 @@ export class Positions {
       }
     };
     if (this.timer.open) {
-      setTimeout(() => this.closePosition(pr, reopen, market, cb, i), 1000);
+      setTimeout(() => this.closePosition(pr, reopen, market, cb, i, time), 1000);
       return;
     }
     if (this.ap && this.position) {
@@ -974,12 +977,12 @@ export class Positions {
           return;
         }
       } else {
-        this.makeClose(price, cb);
+        this.makeClose(price, cb, time);
       }
     }
   }
   /** Make close for test */
-  private makeClose(price: number, cb?: () => void) {
+  private makeClose(price: number, cb?: () => void, time?: number) {
     if (this.ap && this.position) {
       const comission = (price * this.closeFee + this.position.price * this.openFee) * this.position.amount;
       const posRes =
@@ -1030,7 +1033,11 @@ export class Positions {
       }
       this.result.net = this.result.profit.amount + this.result.loss.amount;
       this.position.closePrice = price;
-      this.position.closeTime = new Date().getTime();
+      this.position.closeTime = time || new Date().getTime();
+      if (time) {
+        this.position.humanTime = this.timeAgo.format(this.position.time);
+        this.position.humanCloseTime = this.timeAgo.format(this.position.closeTime);
+      }
       this.position.net = this.math.round(posRes, 2, true);
       this.write();
       this.ap = false;

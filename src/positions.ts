@@ -355,6 +355,7 @@ export class Positions {
         } else if (!this.useBinance) {
           this.ap = true;
           if (time && this.test) {
+            this.result.all++;
             this.position.open = true;
           }
           if (this.cbOpen) {

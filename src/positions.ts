@@ -122,6 +122,7 @@ export class Positions {
   private fallMax: number;
   private fallMin: number;
   private fallPerc: number;
+  private hist: PositionType[];
   constructor(
     wallet = 0,
     limit = 0,
@@ -244,6 +245,7 @@ export class Positions {
       this.checkOpenPositions();
       this.loadHistoryResult();
     }
+    this.hist = [];
   }
   /** Handle Error */
   private handleError(e: any) {
@@ -352,7 +354,7 @@ export class Positions {
           await this.binanceOpenPosition();
         } else if (!this.useBinance) {
           this.ap = true;
-          if (time) {
+          if (time && this.test) {
             this.position.open = true;
           }
           if (this.cbOpen) {
@@ -1034,7 +1036,7 @@ export class Positions {
       this.result.net = this.result.profit.amount + this.result.loss.amount;
       this.position.closePrice = price;
       this.position.closeTime = time || new Date().getTime();
-      if (time) {
+      if (time && this.test) {
         this.position.humanTime = this.timeAgo.format(this.position.time);
         this.position.humanCloseTime = this.timeAgo.format(this.position.closeTime);
       }
@@ -1046,6 +1048,9 @@ export class Positions {
       }
       if (this.cbClose) {
         this.cbClose(this.position.net);
+      }
+      if (this.test) {
+        this.hist.push(this.position);
       }
       this.closing = false;
       this.lastPrice = 0;
@@ -1152,7 +1157,7 @@ export class Positions {
       },
       notOpened: this.result.notOpened,
       net: this.math.round(this.result.net),
-      hist: this.historyResult,
+      hist: this.test ? this.hist : this.historyResult,
       fall,
     };
   }

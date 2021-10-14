@@ -745,7 +745,7 @@ export class Positions {
       }
       if (this.checkPriceRt(now, true)) {
         this.closing = true;
-        this.closePosition(now, false, typeof this.tpsl === 'undefined' || typeof this.tsl === 'undefined');
+        this.closePosition(now, false, this.pair.indexOf('BUSD') !== -1);
       }
     }
   }

@@ -663,7 +663,7 @@ export class Positions {
   async checkPositionRt(now: number, time?: number) {
     this.lastPrice = this.now;
     this.now = now;
-    if (this.bestPrice === 0) {
+    if (this.bestPrice === 0 && this.position && this.ap) {
       this.bestPrice = Math.max(this.lastPrice, this.now);
     } else if (this.bestPrice !== 0 && this.position && this.ap) {
       this.bestPrice =

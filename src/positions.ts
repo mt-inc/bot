@@ -369,7 +369,7 @@ export class Positions {
     }
   }
   /** Binance open position */
-  async binanceOpenPosition(i = 0, market = false) {
+  async binanceOpenPosition(i = 0, market = true) {
     const openPos = (res: QueryFuturesOrderResult) => {
       if (this.position) {
         this.position.partiallyFilled = res.status === 'PARTIALLY_FILLED';
@@ -745,7 +745,7 @@ export class Positions {
       }
       if (this.checkPriceRt(now, true)) {
         this.closing = true;
-        this.closePosition(now, false, this.pair.indexOf('BUSD') !== -1);
+        this.closePosition(now, false);
       }
     }
   }
@@ -792,7 +792,7 @@ export class Positions {
     return;
   }
   /** Close position */
-  async closePosition(pr: number, reopen = false, market = false, cb?: () => void, i = 0, time?: number) {
+  async closePosition(pr: number, reopen = false, market = true, cb?: () => void, i = 0, time?: number) {
     const handleError = (e: any) => {
       if (this.timer.close) {
         clearInterval(this.timer.close);

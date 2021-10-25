@@ -1,6 +1,6 @@
 {
   "name": "@mt-inc/bot",
-  "version": "1.0.9",
+  "version": "1.0.10",
   "description": "Bot for MT Inc. Project",
   "main": "./dist/cjs/index.js",
   "module": "./dist/esm/index.js",

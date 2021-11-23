@@ -123,6 +123,7 @@ export class Positions {
   private fallMin: number;
   private fallPerc: number;
   private hist: PositionType[];
+  private newFormula: boolean;
   constructor(
     wallet = 0,
     limit = 0,
@@ -138,7 +139,9 @@ export class Positions {
     tpsl?: { tpP: number; slP: number },
     tsl?: { tSlP: number },
     test = false,
+    newFromula = false,
   ) {
+    this.newFormula = newFromula;
     this.name = name || `test-${new Date().getTime()}`;
     this.ap = false;
     this.result = {
@@ -160,8 +163,8 @@ export class Positions {
       notOpened: 0,
       net: 0,
     };
-    this.openFee = 0.0002;
-    this.closeFee = 0.0002;
+    this.openFee = 0.0004;
+    this.closeFee = 0.0004;
     this.defFee = 0.0002;
     this.bigDefFee = 0.0004;
     this.start = new Date().getTime();
@@ -570,6 +573,36 @@ export class Positions {
   }
   /** Count SL price */
   private countSL(type: typeof SELL | typeof BUY, price: number, am: number, usable: number) {
+    if (this.newFormula) {
+      if (this.tpsl && this.tpsl.slP > 0) {
+        return type === SELL
+          ? this.math.round(
+              (price * (this.tpsl.slP + 1 + (this.openFee + this.bigDefFee))) / (1 + (this.openFee + this.bigDefFee)),
+              this.pricePrecision[this.pair],
+              true,
+            )
+          : this.math.round(
+              (price * (this.tpsl.slP - 1 + (this.openFee + this.bigDefFee))) / (this.openFee + this.bigDefFee - 1),
+              this.pricePrecision[this.pair],
+              true,
+            );
+      }
+      return type === SELL
+        ? this.math.round(
+            ((price * am * (1 + (this.openFee + this.bigDefFee)) + usable) /
+              (am * (1 - (this.openFee + this.bigDefFee)))) *
+              0.985,
+            this.pricePrecision[this.pair],
+            true,
+          )
+        : this.math.round(
+            ((price * am * (1 - (this.openFee + this.bigDefFee)) - usable) /
+              (am * (1 + (this.openFee + this.bigDefFee)))) *
+              1.015,
+            this.pricePrecision[this.pair],
+            true,
+          );
+    }
     if (this.tpsl && this.tpsl.slP > 0) {
       return type === SELL
         ? this.math.round(
@@ -603,6 +636,22 @@ export class Positions {
   }
   /** Count Trailing Stop Loss price */
   private countTSL(price: number) {
+    if (this.newFormula) {
+      if (this.tsl && this.position) {
+        return this.position.type === SELL
+          ? this.math.round(
+              (price * (this.tsl.tSlP / 3 + 1 + (this.openFee + this.bigDefFee))) /
+                (1 + (this.openFee + this.bigDefFee)),
+              this.pricePrecision[this.pair],
+              true,
+            )
+          : this.math.round(
+              (price * (this.tsl.tSlP / 3 - 1 + (this.openFee + this.bigDefFee))) / (this.openFee + this.bigDefFee - 1),
+              this.pricePrecision[this.pair],
+              true,
+            );
+      }
+    }
     if (this.tsl && this.position) {
       return this.position.type === SELL
         ? this.math.round(
@@ -621,6 +670,34 @@ export class Positions {
   }
   /** Count TP price */
   private countTP(type: typeof SELL | typeof BUY, price: number, am: number, tsl = false) {
+    if (this.newFormula) {
+      if (tsl && this.tsl) {
+        return type === SELL
+          ? this.math.round(
+              (price * (1 - this.tsl.tSlP + (this.openFee + this.bigDefFee))) / (1 + (this.openFee + this.bigDefFee)),
+              this.pricePrecision[this.pair],
+              true,
+            )
+          : this.math.round(
+              (price * (this.tsl.tSlP + 1 + (this.openFee + this.bigDefFee))) / (1 + (this.openFee + this.bigDefFee)),
+              this.pricePrecision[this.pair],
+              true,
+            );
+      }
+      if (this.tpsl && this.tpsl.tpP > 0) {
+        return type === SELL
+          ? this.math.round(
+              (price * (1 - this.tpsl.tpP + (this.openFee + this.bigDefFee))) / (1 + (this.openFee + this.bigDefFee)),
+              this.pricePrecision[this.pair],
+              true,
+            )
+          : this.math.round(
+              (price * (this.tpsl.tpP + 1 + (this.openFee + this.bigDefFee))) / (1 + (this.openFee + this.bigDefFee)),
+              this.pricePrecision[this.pair],
+              true,
+            );
+      }
+    }
     if (tsl && this.tsl) {
       return type === SELL
         ? this.math.round(

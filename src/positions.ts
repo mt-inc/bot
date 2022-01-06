@@ -195,6 +195,7 @@ export class Positions {
       DOGEBUSD: 0,
       SOLUSDT: 0,
       XRPUSDT: 1,
+      '1000SHIBUSDT': 0,
     };
     this.pricePrecision = {
       BTCUSDT: 2,
@@ -209,6 +210,7 @@ export class Positions {
       DOGEBUSD: 5,
       SOLUSDT: 3,
       XRPUSDT: 4,
+      '1000SHIBUSDT': 6,
     };
     this.useBinance = useBinance;
     this.client = client;

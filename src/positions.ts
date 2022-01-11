@@ -196,6 +196,11 @@ export class Positions {
       SOLUSDT: 0,
       XRPUSDT: 1,
       '1000SHIBUSDT': 0,
+      LINKUSDT: 2,
+      ATOMUSDT: 2,
+      FTMUSDT: 0,
+      NEARUSDT: 0,
+      LUNAUSDT: 0,
     };
     this.pricePrecision = {
       BTCUSDT: 2,
@@ -211,6 +216,11 @@ export class Positions {
       SOLUSDT: 3,
       XRPUSDT: 4,
       '1000SHIBUSDT': 6,
+      LINKUSDT: 3,
+      ATOMUSDT: 3,
+      FTMUSDT: 4,
+      NEARUSDT: 4,
+      LUNAUSDT: 3,
     };
     this.useBinance = useBinance;
     this.client = client;

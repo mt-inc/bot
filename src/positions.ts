@@ -124,6 +124,7 @@ export class Positions {
   private fallPerc: number;
   private hist: PositionType[];
   private newFormula: boolean;
+  private fromRestart: boolean;
   constructor(
     wallet = 0,
     limit = 0,
@@ -140,6 +141,7 @@ export class Positions {
     tsl?: { tSlP: number },
     test = false,
     newFromula = false,
+    fromRestart = false,
   ) {
     this.newFormula = newFromula;
     this.name = name || `test-${new Date().getTime()}`;
@@ -261,6 +263,7 @@ export class Positions {
       this.loadHistoryResult();
     }
     this.hist = [];
+    this.fromRestart = fromRestart;
   }
   /** Handle Error */
   private handleError(e: any) {
@@ -325,12 +328,14 @@ export class Positions {
             notOpened: history.filter((item) => !item.open).length,
             net: this.math.round(profAmount - lossAmount),
           };
-          const historyClosed = history.filter((item) => item.closePrice);
-          if (historyClosed.length > 0) {
-            const last = historyClosed[historyClosed.length - 1];
-            const walletLast = last.cost;
-            const netLast = last.net;
-            this.wallet = this.math.round(walletLast + (netLast || 0), 0, true);
+          if (this.fromRestart) {
+            const historyClosed = history.filter((item) => item.closePrice);
+            if (historyClosed.length > 0) {
+              const last = historyClosed[historyClosed.length - 1];
+              const walletLast = last.cost;
+              const netLast = last.net;
+              this.wallet = this.math.round(walletLast + (netLast || 0), 2, true);
+            }
           }
         }
       }

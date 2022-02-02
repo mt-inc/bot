@@ -258,12 +258,12 @@ export class Positions {
       this.bt = new BinanceTransport(this.client);
     }
     this.test = test;
+    this.hist = [];
+    this.fromRestart = fromRestart;
     if (!this.test) {
       this.checkOpenPositions();
       this.loadHistoryResult();
     }
-    this.hist = [];
-    this.fromRestart = fromRestart;
   }
   /** Handle Error */
   private handleError(e: any) {

@@ -325,6 +325,13 @@ export class Positions {
             notOpened: history.filter((item) => !item.open).length,
             net: this.math.round(profAmount - lossAmount),
           };
+          const historyClosed = history.filter((item) => item.closePrice);
+          if (historyClosed.length > 0) {
+            const last = historyClosed[historyClosed.length - 1];
+            const walletLast = last.cost;
+            const netLast = last.net;
+            this.wallet = this.math.round(walletLast + (netLast || 0), 0, true);
+          }
         }
       }
     }
